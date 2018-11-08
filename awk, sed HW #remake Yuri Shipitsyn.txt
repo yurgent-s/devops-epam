@@ -1,0 +1,13 @@
+## Awk
+* What is the most frequent browser (user agent)?
+cat access_log | grep -Po '\"\s\".*\"$' | grep -Po '[^\"]{1,}' | awk -F '"' '{arr[$1]+=1}END{for (ip in arr) print arr[ip], ip}' | uniq |sort -k1n | tail -n2 | head -n1
+* Show number of requests per month for ip 95.108.129.196 (for example: Sep 2016 - 100500 reqs, Oct 2016 - 0 reqs, Nov 2016 - 2 reqs...)
+awk 'BEGIN{cnt=0;}{split($4,y,"/");split(y[3],yy,":");if($1=="95.108.129.196"){r[sprintf("%s %s",y[2],yy[1])]+=1;cnt+=1;}}END{for (i in r) print i, r[i]; print "Total requests:",cnt}' access_log | sort -k1,1M | sort -k2n
+* Show total amount of data which server has provided for each unique ip (i.e. 100500 bytes for 1.2.3.4; 9001 bytes for 5.4.3.2 and so on)
+This task was solved recently.
+
+##SED
+* Change all user agents to "lynx"
+sed -E 's/\"\s\".*\"$/" "lynx"/' access_log
+* Masquerade all ip addresses. For example, 1.2.3.4 becomes "ip1", 3.4.5.6 becomse "ip2" and so on. Rewrite file.
+unset x; declare - Ax; ind = 0; while read line; do word1='echo $line | sed 's/u.*//''; word2 = 'echo $line | sed 's/[^u]*//''; if [[${x[${word1}]} == ""]]; then ((ind++)); x[${word1}]=ip${ind}; fi; echo ${x[${word1}]} $word2 >> interim; done < access_log; mv interim access_log
