@@ -6,6 +6,7 @@ awk 'BEGIN{cnt=0;}{split($4,y,"/");split(y[3],yy,":");if($1=="95.108.129.196"){r
 * Show total amount of data which server has provided for each unique ip (i.e. 100500 bytes for 1.2.3.4; 9001 bytes for 5.4.3.2 and so on)
 This task was solved recently.
 
+
 ##SED
 * Change all user agents to "lynx"
 sed -E 's/\"\s\".*\"$/" "lynx"/' access_log
