@@ -1,0 +1,89 @@
+	Домашнее задание
+2.1. Imagine your localhost has been relocated to Havana. Change the time zone on the localhost to Havana and verify the time zone has been changed properly. (may be multiple commands)
+
+[root@localhost yuri]# timedatectl list-timezones | grep Havana ##searching Havana timezone
+America/Havana
+[root@localhost yuri]# timedatectl set-timezone America/Havana
+##Checking changes 1
+[root@localhost yuri]# date
+Fri Nov 16 12:30:53 CST 2018
+[root@localhost yuri]# ls -l /etc/localtime
+lrwxrwxrwx. 1 root root 36 Nov 16 12:30 /etc/localtime -> ../usr/share/zoneinfo/America/Havana
+##Checking changes 2
+[root@localhost yuri]# timedatectl status
+      Local time: Fri 2018-11-16 12:36:03 CST
+  Universal time: Fri 2018-11-16 17:36:03 UTC
+        RTC time: Fri 2018-11-16 17:14:14
+       Time zone: America/Havana (CST, -0500)
+     NTP enabled: yes
+NTP synchronized: no
+ RTC in local TZ: no
+      DST active: no
+ Last DST change: DST ended at
+                  Sun 2018-11-04 00:59:59 CDT
+                  Sun 2018-11-04 00:00:00 CST
+ Next DST change: DST begins (the clock jumps one hour forward) at
+                  Sat 2019-03-09 23:59:59 CST
+                  Sun 2019-03-10 01:00:00 CDT
+
+2.2. Find all systemd journal messages on localhost, that were recorded in the last 50 minutes and originate from a system service started with user id 81. (single command)
+
+[root@localhost yuri]# journalctl _UID=81 --since "50 minutes ago"
+-- Logs begin at Fri 2018-11-16 05:48:55 CST, end at Fri 2018-11-16 13:05:48 CST
+Nov 16 12:30:49 localhost.localdomain dbus[623]: [system] Activating via systemd
+Nov 16 12:30:49 localhost.localdomain dbus[623]: [system] Successfully activated
+Nov 16 12:36:03 localhost.localdomain dbus[623]: [system] Activating via systemd
+Nov 16 12:36:03 localhost.localdomain dbus[623]: [system] Successfully activated
+...skipping...
+-- Logs begin at Fri 2018-11-16 05:48:55 CST, end at Fri 2018-11-16 13:05:48 CST
+Nov 16 12:30:49 localhost.localdomain dbus[623]: [system] Activating via systemd
+Nov 16 12:30:49 localhost.localdomain dbus[623]: [system] Successfully activated
+Nov 16 12:36:03 localhost.localdomain dbus[623]: [system] Activating via systemd
+Nov 16 12:36:03 localhost.localdomain dbus[623]: [system] Successfully activated
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+lines 1-5/5 (END)...skipping...
+-- Logs begin at Fri 2018-11-16 05:48:55 CST, end at Fri 2018-11-16 13:05:48 CST. --
+Nov 16 12:30:49 localhost.localdomain dbus[623]: [system] Activating via systemd: service name='org.freedesktop.timedate1' unit='dbus-org.freedesktop.timedat
+Nov 16 12:30:49 localhost.localdomain dbus[623]: [system] Successfully activated service 'org.freedesktop.timedate1'
+Nov 16 12:36:03 localhost.localdomain dbus[623]: [system] Activating via systemd: service name='org.freedesktop.timedate1' unit='dbus-org.freedesktop.timedat
+Nov 16 12:36:03 localhost.localdomain dbus[623]: [system] Successfully activated service 'org.freedesktop.timedate1'
+~
+~
+
+2.3. Configure rsyslogd by adding a rule to the newly created configuration file /etc/rsyslog.d/auth-errors.conf to log all security and authentication messages with the priority alert and higher to the /var/log/auth-errors file. Test the newly added log directive with the logger command. (multiple commands)
+
+[root@localhost ~]# cd /var/log/
+[root@localhost log]# touch auth-errors
+[root@localhost log]# cd /etc/rsyslog.d/
+[root@localhost rsyslog.d]# vi auth-errors.conf
+
+#A rule, to store security and authentication messages with level alert and higher.
+auth,authpriv.alert             /var/log/auth-errors
+ 
+[root@localhost ~]# service rsyslog restart
+Redirecting to /bin/systemctl restart rsyslog.service
+
+[root@localhost log]# logger -p authpriv.alert test
+[root@localhost log]# tail -5 /var/log/auth-errors
+Nov 16 15:17:56 localhost yuri: test
+
+
+
+
