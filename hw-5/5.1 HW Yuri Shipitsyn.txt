@@ -1,4 +1,4 @@
-	Домашняя работа
+	Home work
 
 1.1. SSH to host 35.228.120.217 using username and password, provided to you in private chat. Log out from remotehost
 
