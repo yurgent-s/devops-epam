@@ -1,4 +1,4 @@
-	Home work
+	Home work.
 	
 2.1. Imagine your localhost has been relocated to Havana. Change the time zone on the localhost to Havana and verify the time zone has been changed properly. (may be multiple commands)
 
