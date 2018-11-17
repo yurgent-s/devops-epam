@@ -1,4 +1,4 @@
-	Домашнее задание
+	Р”РѕРјР°С€РЅСЏСЏ СЂР°Р±РѕС‚Р°
 
 1.1. SSH to host 35.228.120.217 using username and password, provided to you in private chat. Log out from remotehost
 
@@ -87,7 +87,7 @@ Connection to 35.228.120.217 closed.
 
 1.7. Using ssh setup port forwarding so that you can reach webserver from your localhost (choose any free local port you like).
 
-[yuri@localhost ~]$ ssh -L 5900:127.0.0.1:8080 10.166.0.2 ##as i understand, we just opening port for webserver and there dont have to be any text messaging underneath
+[yuri@localhost ~]$ ssh -L 5900:127.0.0.1:8080 10.166.0.2 ##as i understand, we just opening port for webserver and there dont have to be any text messaging about it underneath
 ^C
 
 1.8 Like in 1.6, but on localhost this time use command line utility to verify that localhost and port you've specified act like webserver, returning same result as in 1.6
