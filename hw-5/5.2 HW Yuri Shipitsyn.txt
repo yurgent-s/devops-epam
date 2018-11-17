@@ -1,4 +1,5 @@
-	Домашнее задание
+	Р”РѕРјР°С€РЅСЏСЏ СЂР°Р±РѕС‚Р°
+	
 2.1. Imagine your localhost has been relocated to Havana. Change the time zone on the localhost to Havana and verify the time zone has been changed properly. (may be multiple commands)
 
 [root@localhost yuri]# timedatectl list-timezones | grep Havana ##searching Havana timezone
