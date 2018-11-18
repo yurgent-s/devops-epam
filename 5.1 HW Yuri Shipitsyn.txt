@@ -1,4 +1,4 @@
-	Домашнее задание
+	Г„Г®Г¬Г ГёГ­ГҐГҐ Г§Г Г¤Г Г­ГЁГҐ
 
 1.1. SSH to host 35.228.120.217 using username and password, provided to you in private chat. Log out from remotehost
 
@@ -75,34 +75,59 @@ Last login: Thu Nov 15 14:10:55 2018 from 91.238.230.13
 1.6. Using command line utility (curl or telnet) verify that there are some webserver running on port 8080 of IP 10.166.0.2. Notice that 10.166.0.2 is a private network IP so you can access it only from the same network (when you're on remotehost, that runs in the same private network). Log out from remotehost
 
 [yuri@localhost ~]$ ssh remotehost
-Last login: Thu Nov 15 14:24:46 2018 from 91.238.230.13
-[shipiu@new-students-ssh ~]$ curl -v telnet://10.166.0.2:8080
-* About to connect() to 10.166.0.2 port 8080 (#0)
-*   Trying 10.166.0.2...
-* Connected to 10.166.0.2 (10.166.0.2) port 8080 (#0)
-^C
-[shipiu@new-students-ssh ~]$ ^C
-[shipiu@new-students-ssh ~]$ logout
-Connection to 35.228.120.217 closed.
+Last login: Fri Nov 16 17:54:30 2018 from 178.70.178.127
+
+[shipiu@new-students-ssh ~]$ curl 10.166.0.2:8080
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN"><html>
+<title>Directory listing for /</title>
+<body>
+<h2>Directory listing for /</h2>
+<hr>
+<ul>
+<li><a href="backup_imageme.py">backup_imageme.py</a>
+<li><a href="imageme.html">imageme.html</a>
+<li><a href="imageme.py">imageme.py</a>
+<li><a href="photo5260291072024750427.jpg">photo5260291072024750427.jpg</a>
+<li><a href="photo5393072764824431125.png">photo5393072764824431125.png</a>
+<li><a href="photo5393072764824431824.jpg">photo5393072764824431824.jpg</a>
+<li><a href="photo5422836072141924924.jpg">photo5422836072141924924.jpg</a>
+<li><a href="photo5422836072141924931.jpg">photo5422836072141924931.jpg</a>
+<li><a href="photo5422836072141924933.jpg">photo5422836072141924933.jpg</a>
+<li><a href="photo5471923429461567978.jpg">photo5471923429461567978.jpg</a>
+<li><a href="web.log">web.log</a>
+</ul>
+<hr>
+</body>
+</html>
 
 1.7. Using ssh setup port forwarding so that you can reach webserver from your localhost (choose any free local port you like).
 
-[yuri@localhost ~]$ ssh -L 5900:127.0.0.1:8080 10.166.0.2 ##as i understand, we just opening port for webserver and there dont have to be any text messaging underneath
-^C
+[yuri@localhost ~]$ ssh -f -N -L 5900:10.166.0.2:8080 remotehost 
 
 1.8 Like in 1.6, but on localhost this time use command line utility to verify that localhost and port you've specified act like webserver, returning same result as in 1.6
 
-[root@localhost yuri]# nmap -p 8080 10.166.0.2
-
-Starting Nmap 6.40 ( http://nmap.org ) at 2018-11-16 20:20 MSK
-Nmap scan report for 10.166.0.2
-Host is up (0.00069s latency).
-PORT     STATE    SERVICE
-8080/tcp filtered http-proxy
-
-Nmap done: 1 IP address (1 host up) scanned in 0.28 seconds
-
-##According to a result of nmap command, we v listened 8080 port of 10.166.0.2, as it is running on working http-proxy therefore it is webserver.
+[yuri@localhost ~]$ curl http://localhost:5900
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN"><html>
+<title>Directory listing for /</title>
+<body>
+<h2>Directory listing for /</h2>
+<hr>
+<ul>
+<li><a href="backup_imageme.py">backup_imageme.py</a>
+<li><a href="imageme.html">imageme.html</a>
+<li><a href="imageme.py">imageme.py</a>
+<li><a href="photo5260291072024750427.jpg">photo5260291072024750427.jpg</a>
+<li><a href="photo5393072764824431125.png">photo5393072764824431125.png</a>
+<li><a href="photo5393072764824431824.jpg">photo5393072764824431824.jpg</a>
+<li><a href="photo5422836072141924924.jpg">photo5422836072141924924.jpg</a>
+<li><a href="photo5422836072141924931.jpg">photo5422836072141924931.jpg</a>
+<li><a href="photo5422836072141924933.jpg">photo5422836072141924933.jpg</a>
+<li><a href="photo5471923429461567978.jpg">photo5471923429461567978.jpg</a>
+<li><a href="web.log">web.log</a>
+</ul>
+<hr>
+</body>
+</html>
 
 
 
