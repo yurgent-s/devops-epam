@@ -1,0 +1,266 @@
+	Home work.
+
+	##~~~ stands for a big piece of code.
+
+	#At first i am checking if the following packets:
+# figlet-2.2.5-9.el7.x86_64.rpm  filezilla-3.7.4.1-1.el7.x86_64.rpm	are installed.
+[root@localhost yuri]# rpm -qa "figlet*"
+[root@localhost yuri]# rpm -qa "filezilla*"
+
+	#As they are not in the system i will install them with rpm and yum
+[root@localhost yuri]# rpm -i https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/f/figlet-2.2.5-9.el7.x86_64.rpm
+[root@localhost yuri]# yum install https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/f/filezilla-3.7.4.1-1.el7.x86_64.rpm
+
+	#Log from the install with yum, as a log is extremely big, i decided to short it.
+
+Loaded plugins: fastestmirror
+filezilla-3.7.4.1-1.el7.x86_64.rpm                       | 3.1 MB     00:09
+Examining /var/tmp/yum-root-GJRF2b/filezilla-3.7.4.1-1.el7.x86_64.rpm: filezilla-3.7.4.1-1.el7.x86_64
+Marking /var/tmp/yum-root-GJRF2b/filezilla-3.7.4.1-1.el7.x86_64.rpm to be installed
+Resolving Dependencies
+--> Running transaction check
+---> Package filezilla.x86_64 0:3.7.4.1-1.el7 will be installed
+~~~
+
+Installed:
+  filezilla.x86_64 0:3.7.4.1-1.el7
+
+~~~
+
+Complete!
+	#Showing that figlet is installed
+[root@localhost yuri]# rpm -qa --last | grep figlet
+figlet-2.2.5-9.el7.x86_64                     Mon 19 Nov 2018 11:03:28 AM CST
+
+	#Showing yum history, to assure that filezilla installed
+[root@localhost yuri]# yum history
+Loaded plugins: fastestmirror
+ID     | Command line             | Date and time    | Action(s)      | Altered
+-------------------------------------------------------------------------------
+    25 | install https://dl.fedor | 2018-11-19 11:12 | Install        |   27  < 
+~~~
+#filezilla installed
+
+	#Removing all installed packages with different methods
+
+[root@localhost yuri]# rpm -e figlet-2.2.5-9.el7.x86_64
+
+[root@localhost yuri]# yum remove filezilla
+Loaded plugins: fastestmirror
+Resolving Dependencies
+--> Running transaction check
+---> Package filezilla.x86_64 0:3.7.4.1-1.el7 will be erased
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================================
+ Package                              Arch                              Version                                   Repository                            Size
+=============================================================================================================================================================
+Removing:
+ filezilla                            x86_64                            3.7.4.1-1.el7                             installed                             12 M
+
+Transaction Summary
+=============================================================================================================================================================
+Remove  1 Package
+
+Installed size: 12 M
+Is this ok [y/N]: y
+Downloading packages:
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+Warning: RPMDB altered outside of yum.
+  Erasing    : filezilla-3.7.4.1-1.el7.x86_64                                                                                                            1/1
+  Verifying  : filezilla-3.7.4.1-1.el7.x86_64                                                                                                            1/1
+
+Removed:
+  filezilla.x86_64 0:3.7.4.1-1.el7
+
+Complete!
+
+	#As for an additional repository i have chosen SCL, for example.
+ 	#On https://wiki.centos.org/SpecialInterestGroup/SCLo/CollectionsList are all available packages in SCL. i have chosen Maven 3.0.5.
+	#I read about enabling repositories for SCL, but there is no need of it. If i would be on RHEL, i would activate repository for SCL yum-config-manager --enable rhel-server-rhscl-7-rpms
+	
+	#Installing SCL
+[root@localhost yuri]#  yum install centos-release-scl
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+epel/x86_64/metalink                                                                                                                  |  30 kB  00:00:00
+ * base: centos-mirror.rbc.ru
+ * epel: mirror.logol.ru
+ * extras: dedic.sh
+ * updates: mirror.logol.ru
+base                                                                                                                                  | 3.6 kB  00:00:00
+epel                                                                                                                                  | 3.2 kB  00:00:00
+extras                                                                                                                                | 3.4 kB  00:00:00
+updates                                                                                                                               | 3.4 kB  00:00:00
+(1/2): epel/x86_64/updateinfo                                                                                                         | 932 kB  00:00:02
+(2/2): epel/x86_64/primary                                                                                                            | 3.6 MB  00:00:05
+epel                                                                                                                                             12708/12708
+Resolving Dependencies
+--> Running transaction check
+---> Package centos-release-scl.noarch 0:2-2.el7.centos will be installed
+--> Processing Dependency: centos-release-scl-rh for package: centos-release-scl-2-2.el7.centos.noarch
+--> Running transaction check
+---> Package centos-release-scl-rh.noarch 0:2-2.el7.centos will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================================
+ Package                                       Arch                           Version                                   Repository                      Size
+=============================================================================================================================================================
+Installing:
+ centos-release-scl                            noarch                         2-2.el7.centos                            extras                          12 k
+Installing for dependencies:
+ centos-release-scl-rh                         noarch                         2-2.el7.centos                            extras                          12 k
+
+Transaction Summary
+=============================================================================================================================================================
+Install  1 Package (+1 Dependent package)
+
+Total download size: 24 k
+Installed size: 39 k
+Is this ok [y/d/N]: y
+Downloading packages:
+(1/2): centos-release-scl-2-2.el7.centos.noarch.rpm                                                                                   |  12 kB  00:00:01
+(2/2): centos-release-scl-rh-2-2.el7.centos.noarch.rpm                                                                                |  12 kB  00:00:01
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                                                         19 kB/s |  24 kB  00:00:01
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : centos-release-scl-rh-2-2.el7.centos.noarch                                                                                               1/2
+  Installing : centos-release-scl-2-2.el7.centos.noarch                                                                                                  2/2
+  Verifying  : centos-release-scl-rh-2-2.el7.centos.noarch                                                                                               1/2
+  Verifying  : centos-release-scl-2-2.el7.centos.noarch                                                                                                  2/2
+
+Installed:
+  centos-release-scl.noarch 0:2-2.el7.centos
+
+Dependency Installed:
+  centos-release-scl-rh.noarch 0:2-2.el7.centos
+
+Complete!
+	#Installing chosen Maven
+[root@localhost yuri]# yum install maven30
+	#Log of installing process, as it is far too long, i have shortened it
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: centos-mirror.rbc.ru
+ * epel: mirror.logol.ru
+ * extras: dedic.sh
+ * updates: mirror.logol.ru
+centos-sclo-rh                                                                                                                        | 3.0 kB  00:00:00
+centos-sclo-sclo                                                                                                                      | 2.9 kB  00:00:00
+(1/2): centos-sclo-sclo/x86_64/primary_db                                                                                             | 294 kB  00:00:01
+(2/2): centos-sclo-rh/x86_64/primary_db                                                                                               | 3.7 MB  00:00:04
+Resolving Dependencies
+--> Running transaction check
+---> Package maven30.x86_64 0:1.1-27.el7 will be installed
+~~~
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                                                        647 kB/s |  81 MB  00:02:07
+Retrieving key from file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-SCLo
+Importing GPG key 0xF2EE9D55:
+ Userid     : "CentOS SoftwareCollections SIG (https://wiki.centos.org/SpecialInterestGroup/SCLo) <security@centos.org>"
+ Fingerprint: c4db d535 b1fb ba14 f8ba 64a8 4eb8 4e71 f2ee 9d55
+ Package    : centos-release-scl-rh-2-2.el7.centos.noarch (@extras)
+ From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-SCLo
+Is this ok [y/N]: y
+~~~
+
+Installed:
+  maven30.x86_64 0:1.1-27.el7
+
+~~~
+Dependency Updated:
+  nspr.x86_64 0:4.19.0-1.el7_5         nss.x86_64 0:3.36.0-7.el7_5        nss-softokn.x86_64 0:3.36.0-5.el7_5  nss-softokn-freebl.x86_64 0:3.36.0-5.el7_5
+  nss-sysinit.x86_64 0:3.36.0-7.el7_5  nss-tools.x86_64 0:3.36.0-7.el7_5  nss-util.x86_64 0:3.36.0-1.el7_5
+
+Complete!
+
+	#Showing history
+[root@localhost yuri]# yum history
+Loaded plugins: fastestmirror
+ID     | Command line             | Date and time    | Action(s)      | Altered
+-------------------------------------------------------------------------------
+    28 | install maven30          | 2018-11-21 07:41 | I, U           |   74
+~~~
+
+	#Removing installed package
+[root@localhost yuri]# yum remove maven30
+Loaded plugins: fastestmirror
+Resolving Dependencies
+--> Running transaction check
+---> Package maven30.x86_64 0:1.1-27.el7 will be erased
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================================
+ Package                            Arch                              Version                               Repository                                  Size
+=============================================================================================================================================================
+Removing:
+ maven30                            x86_64                            1.1-27.el7                            @centos-sclo-rh                            0.0
+
+Transaction Summary
+=============================================================================================================================================================
+Remove  1 Package
+
+Installed size: 0
+Is this ok [y/N]: y
+Downloading packages:
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Erasing    : maven30-1.1-27.el7.x86_64                                                                                                                 1/1
+  Verifying  : maven30-1.1-27.el7.x86_64                                                                                                                 1/1
+
+Removed:
+  maven30.x86_64 0:1.1-27.el7
+
+Complete!
+	
+	#Removing the SCL repository, that i have installed
+[root@localhost yuri]# yum remove centos-release-scl
+Loaded plugins: fastestmirror
+Resolving Dependencies
+--> Running transaction check
+---> Package centos-release-scl.noarch 0:2-2.el7.centos will be erased
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================================
+ Package                                     Arch                            Version                                  Repository                        Size
+=============================================================================================================================================================
+Removing:
+ centos-release-scl                          noarch                          2-2.el7.centos                           @extras                           19 k
+
+Transaction Summary
+=============================================================================================================================================================
+Remove  1 Package
+
+Installed size: 19 k
+Is this ok [y/N]: y
+Downloading packages:
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Erasing    : centos-release-scl-2-2.el7.centos.noarch                                                                                                  1/1
+  Verifying  : centos-release-scl-2-2.el7.centos.noarch                                                                                                  1/1
+
+Removed:
+  centos-release-scl.noarch 0:2-2.el7.centos
+
+Complete!
+
+
+

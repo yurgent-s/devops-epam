@@ -1,0 +1,234 @@
+	Homework.
+
+	#Making a report about every log-file in /var/log
+[yuri@localhost ~]$ cd /var/log
+[yuri@localhost log]$ ll -h > /home/yuri/reportlogs.txt
+
+	#Making a report about /home using du
+[yuri@localhost log]$ du -h /home > /home/yuri/reporthome.txt
+
+	#Alice and Bob, creating files
+[root@localhost log]# cd /
+[root@localhost /]# mkdir share
+[root@localhost /]# cd share/
+[root@localhost share]# touch epam 
+[root@localhost share]# touch devops
+[root@localhost share]# ll
+total 0
+-rw-r--r--. 1 root root 0 Nov 21 09:49 devops
+-rw-r--r--. 1 root root 0 Nov 21 09:48 epam
+[root@localhost share]# setfacl -Rm u:bob:rwx /share #setting rights
+[root@localhost share]# setfacl -Rm u:alice:rwx /share #setting rights
+	#Creating hard link
+[root@localhost home]# ln /share/devops /home/bob/hardlinkfile1
+[root@localhost home]# ln /share/epam /home/bob/hardlinkfile2
+[root@localhost home]# ln /share/devops /home/alice/hardlinkfile1
+[root@localhost home]# ln /share/epam /home/alice/hardlinkfile2
+	#Creating soft link
+[root@localhost home]# ln -s /share/devops /home/bob/softlinkfile1
+[root@localhost home]# ln -s /share/epam /home/bob/softlinkfile2
+[root@localhost home]# ln -s /share/devops /home/alice/softlinkfile1
+[root@localhost home]# ln -s /share/epam /home/alice/softlinkfile2
+	#Lets check our hard and soft links as a Bob user (Alice will have the same result)
+	#Parsing some text in our two files.
+echo "Sample text" >> /share/devops
+echo "Sample text for HW" >> /share/epam
+	#Checking links 
+[root@localhost bob]# ll
+total 8
+-rwxrwsr-x+ 3 root root 12 Nov 21 10:47 hardlinkfile1
+-rwxrwsr-x+ 3 root root 19 Nov 21 10:48 hardlinkfile2
+lrwxrwxrwx. 1 root root 13 Nov 21 10:29 softlinkfile1 -> /share/devops
+lrwxrwxrwx. 1 root root 11 Nov 21 10:29 softlinkfile2 -> /share/epam
+	#Text in link files
+[root@localhost bob]# cat /home/bob/hardlinkfile1
+Sample text
+[root@localhost bob]# cat /home/bob/hardlinkfile2
+Sample text for HW
+[root@localhost bob]# cat /home/bob/softlinkfile1
+Sample text
+[root@localhost bob]# cat /home/bob/softlinkfile2
+Sample text for HW
+	#Deleting /share/devops and /share/epam, showing reaction of links
+[root@localhost bob]# rm /share/devops
+rm: remove regular file ‘/share/devops’? y
+[root@localhost bob]# rm /share/epam
+rm: remove regular file ‘/share/epam’? y
+	#After that soft links in home directory of Bob changed color from blue to red(same for Alice)
+[root@localhost bob]# cat /home/bob/hardlinkfile1
+Sample text
+[root@localhost bob]# cat /home/bob/hardlinkfile2
+Sample text for HW
+[root@localhost bob]# cat /home/bob/softlinkfile1
+cat: /home/bob/softlinkfile1: No such file or directory
+[root@localhost bob]# cat /home/bob/softlinkfile2
+cat: /home/bob/softlinkfile2: No such file or directory
+	#Deleting links
+[root@localhost ~]# rm /home/bob/hardlinkfile1
+rm: remove regular file ‘/home/bob/hardlinkfile1’? y
+[root@localhost ~]# rm /home/bob/hardlinkfile2
+rm: remove regular file ‘/home/bob/hardlinkfile2’? y
+[root@localhost ~]# rm /home/alice/hardlinkfile1
+rm: remove regular file ‘/home/alice/hardlinkfile1’? y
+[root@localhost ~]# rm /home/alice/hardlinkfile2
+rm: remove regular file ‘/home/alice/hardlinkfile2’? y
+[root@localhost ~]# rm /home/bob/softlinkfile1
+rm: remove symbolic link ‘/home/bob/softlinkfile1’? y
+[root@localhost ~]# rm /home/bob/softlinkfile2
+rm: remove symbolic link ‘/home/bob/softlinkfile2’? y
+[root@localhost ~]# rm /home/alice/softlinkfile1
+rm: remove symbolic link ‘/home/alice/softlinkfile1’? y
+[root@localhost ~]# rm /home/alice/softlinkfile2
+rm: remove symbolic link ‘/home/alice/softlinkfile2’? y
+
+	#Creating "trash"
+[root@localhost ~]# cd /
+[root@localhost /]# mkdir trash
+	#Adding directories and files from different users
+[root@localhost /]# cd trash/
+[root@localhost trash]# ll
+total 0
+[root@localhost trash]# mkdir dir1
+[root@localhost trash]# mkdir dir2
+[root@localhost trash]# setfacl -Rm 'u:bob:rwx' /trash
+[root@localhost trash]# setfacl -Rm 'u:alice:rwx' /trash
+[bob@localhost ~]$ cd /trash/
+[bob@localhost trash]$ touch bobfile
+[alice@localhost ~]$ cd /trash
+[alice@localhost trash]$ ll
+total 0
+-rw-rw-r--. 1 bob  bob  0 Nov 21 11:09 bobfile
+drwxrwxr-x+ 2 root root 6 Nov 21 11:05 dir1
+drwxrwxr-x+ 2 root root 6 Nov 21 11:05 dir2
+[alice@localhost trash]$ cd dir1
+[alice@localhost dir1]$ touch alicefile
+	#Using locate before downloading images
+[root@localhost trash]# locate .jpg
+/usr/share/backgrounds/day.jpg
+/usr/share/backgrounds/default.jpg
+/usr/share/backgrounds/morning.jpg
+/usr/share/backgrounds/night.jpg
+/usr/share/kde4/apps/ksplash/Themes/CentOS7/2560x1600/background.jpg
+/usr/share/wallpapers/CentOS7/contents/images/2560x1600.jpg
+	#Downloading images in trash and changing their name
+[root@localhost trash]# cd dir1
+[root@localhost dir1]# wget https://pm1.narvii.com/6833/3e501fd762dadda481531d7fe68d76f2dabccad9v2_00.jpg
+--2018-11-21 11:39:53--  https://pm1.narvii.com/6833/3e501fd762dadda481531d7fe68d76f2dabccad9v2_00.jpg
+Resolving pm1.narvii.com (pm1.narvii.com)... 143.204.47.91, 143.204.47.84, 143.204.47.120, ...
+Connecting to pm1.narvii.com (pm1.narvii.com)|143.204.47.91|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 27977 (27K) [image/jpeg]
+Saving to: ‘3e501fd762dadda481531d7fe68d76f2dabccad9v2_00.jpg’
+
+100%[===========================================>] 27,977      --.-K/s   in 0.03s
+
+2018-11-21 11:39:54 (995 KB/s) - ‘3e501fd762dadda481531d7fe68d76f2dabccad9v2_00.jpg’ saved [27977/27977]
+[root@localhost dir1]# mv 3e501fd762dadda481531d7fe68d76f2dabccad9v2_00.jpg image1.jpg
+	#Waiting for some time to load another pic
+[root@localhost trash]# cd dir2
+[root@localhost dir2]# ll
+total 0
+[root@localhost dir2]# wget http://brightwallpapers.com.ua/Uploads/21-6-2014/40a824d0-02ed-408a-a2d9-424373d8dd53/thumb-d3731cc211deefd45fc383375eca5da1.jpg
+--2018-11-21 11:43:35--  http://brightwallpapers.com.ua/Uploads/21-6-2014/40a824d0-02ed-408a-a2d9-424373d8dd53/thumb-d3731cc211deefd45fc383375eca5da1.jpg
+Resolving brightwallpapers.com.ua (brightwallpapers.com.ua)... 95.154.237.45
+Connecting to brightwallpapers.com.ua (brightwallpapers.com.ua)|95.154.237.45|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 44321 (43K) [image/jpeg]
+Saving to: ‘thumb-d3731cc211deefd45fc383375eca5da1.jpg’
+
+100%[===========================================>] 44,321      76.8KB/s   in 0.6s
+
+2018-11-21 11:43:35 (76.8 KB/s) - ‘thumb-d3731cc211deefd45fc383375eca5da1.jpg’ saved [44321/44321]
+
+[root@localhost dir2]# ll
+total 44
+-rw-r--r--. 1 root root 44321 Nov 20  2015 thumb-d3731cc211deefd45fc383375eca5da1.jpg
+[root@localhost dir2]# mv thumb-d3731cc211deefd45fc383375eca5da1.jpg image2.jpg
+	#Creating links in /trash (for example just hard links for files and soft links for directories)
+[root@localhost dir2]# ln -s /trash/dir1 /trash/dir1link
+[root@localhost trash]# ln -s /trash/dir2 /trash/dir2link
+[root@localhost trash]# ln /trash/bobfile /trash/hardlinkbob
+[root@localhost trash]# ln /trash/dir1/alicefile /trash/hardlinkalice
+[root@localhost trash]# ln /trash/dir1/image1.jpg /trash/hardlinkimage1
+[root@localhost trash]# ln /trash/dir2/image2.jpg /trash/hardlinkimage2
+[root@localhost trash]# ll
+total 72
+-rw-rw-r--. 2 bob   bob       0 Nov 21 11:09 bobfile
+drwxrwxr-x+ 2 root  root     41 Nov 21 11:40 dir1
+lrwxrwxrwx. 1 root  root     11 Nov 21 11:58 dir1link -> /trash/dir1
+drwxrwxr-x+ 2 root  root     24 Nov 21 11:44 dir2
+lrwxrwxrwx. 1 root  root     11 Nov 21 11:58 dir2link -> /trash/dir2
+-rw-rw-r--. 2 alice alice     0 Nov 21 11:12 hardlinkalice
+-rw-rw-r--. 2 bob   bob       0 Nov 21 11:09 hardlinkbob
+-rw-r--r--. 2 root  root  27977 May 19  2018 hardlinkimage1
+-rw-r--r--. 2 root  root  44321 Nov 20  2015 hardlinkimage2
+	#Using locate after downloading images
+[root@localhost ~]# updatedb #Updating data base of locate
+[root@localhost ~]# locate .jpg
+/trash/dir1/image1.jpg
+/trash/dir2/image2.jpg
+/usr/share/backgrounds/day.jpg
+/usr/share/backgrounds/default.jpg
+/usr/share/backgrounds/morning.jpg
+/usr/share/backgrounds/night.jpg
+/usr/share/kde4/apps/ksplash/Themes/CentOS7/2560x1600/background.jpg
+/usr/share/wallpapers/CentOS7/contents/images/2560x1600.jpg
+	#Using find searching for all images
+[root@localhost /]# find -type f -regex "^.*\.\(png\|jpg\|jpeg\)$"
+	#Using find searching for only JPG type images
+[root@localhost /]# find / -type f -iname "*.jpg"
+	#Find all links: hard and soft, also directories and files
+[root@localhost yuri]# find / -type f -o -type l -o -type d | grep /trash
+/trash
+/trash/dir1
+/trash/dir1/alicefile
+/trash/dir1/image1.jpg
+/trash/dir2
+/trash/dir2/image2.jpg
+/trash/bobfile
+/trash/dir1link
+/trash/dir2link
+/trash/hardlinkbob
+/trash/hardlinkalice
+/trash/hardlinkimage1
+/trash/hardlinkimage2
+	#Find only directory links
+[root@localhost yuri]# find / -type d -links +1 | grep /trash
+/trash
+/trash/dir1
+/trash/dir2
+	#Random searching files, accessed 21.11.2018 with size less than 1 Megabyte
+[root@localhost trash]# find / -newerat 2018-11-21 -size -1M
+	#Deleting /trash directory
+[root@localhost /]# rm -R /trash
+rm: descend into directory ‘/trash’? y
+rm: descend into directory ‘/trash/dir1’? y
+rm: remove regular empty file ‘/trash/dir1/alicefile’? y
+rm: remove regular file ‘/trash/dir1/image1.jpg’? y
+rm: remove directory ‘/trash/dir1’? y
+rm: descend into directory ‘/trash/dir2’? y
+rm: remove regular file ‘/trash/dir2/image2.jpg’? y
+rm: remove directory ‘/trash/dir2’? y
+rm: remove regular empty file ‘/trash/bobfile’? y
+rm: remove symbolic link ‘/trash/dir1link’? y
+rm: remove symbolic link ‘/trash/dir2link’? y
+rm: remove regular empty file ‘/trash/hardlinkbob’? y
+rm: remove regular empty file ‘/trash/hardlinkalice’? y
+rm: remove regular file ‘/trash/hardlinkimage1’? y
+rm: remove regular file ‘/trash/hardlinkimage2’? y
+rm: remove regular file ‘/trash/example’? y
+rm: remove directory ‘/trash’? y
+
+
+	
+
+
+	
+
+
+
+
+
+
+
+
