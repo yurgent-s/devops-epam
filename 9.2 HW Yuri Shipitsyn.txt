@@ -1,0 +1,177 @@
+	Homework.
+
+2.1. Create 2GB partition on /dev/sdc of type "Linux LVM"
+
+[root@localhost ~]# fdisk /dev/sdb
+WARNING: fdisk GPT support is currently new, and therefore in an experimental phase. Use at your own discretion.
+Welcome to fdisk (util-linux 2.23.2).
+
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+
+Command (m for help): n
+Partition number (3-128, default 3): 3
+First sector (34-10485726, default 5244928):
+Last sector, +sectors or +size{K,M,G,T,P} (5244928-10485726, default 10485726): +2G
+Created partition 3
+
+
+Command (m for help): t
+Partition number (1-3, default 3): 3
+Partition type (type L to list all types): 31
+Changed type of partition 'Linux filesystem' to 'Linux LVM'
+
+Command (m for help): p #Checking what was created
+
+Disk /dev/sdb: 5368 MB, 5368709120 bytes, 10485760 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk label type: gpt
+Disk identifier: 1F767949-BD76-4017-9E9A-021AC1143BB4
+
+
+#         Start          End    Size  Type            Name
+ 1         2048      4196351      2G  Linux filesyste Linux filesystem
+ 2      4196352      5244927    512M  Linux swap      Linux swap
+ 3      5244928      9439231      2G  Linux LVM
+
+Command (m for help): w
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+
+WARNING: Re-reading the partition table failed with error 16: Device or resource busy.
+The kernel still uses the old table. The new table will be used at
+the next reboot or after you run partprobe(8) or kpartx(8)
+Syncing disks.
+[root@localhost ~]# partprobe #Inform the Cent OS of partition table changes
+
+2.2. Initialize the partition as a physical volume (PV)
+
+[root@localhost ~]# pvcreate /dev/sdb3
+  Physical volume "/dev/sdb3" successfully created.
+
+
+2.3. Extend the volume group (VG) of your root device using your newly created PV
+
+[root@localhost ~]# df /root #Checking what device is initialized to root
+Filesystem              1K-blocks    Used Available Use% Mounted on
+/dev/mapper/centos-root   6486016 2406224   4079792  38% /
+
+[root@localhost ~]# lvs -o +devices /dev/mapper/centos-root #Checking info about VG
+  LV   VG     Attr       LSize  Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert Devices
+  root centos -wi-ao---- <6.20g                                                     /dev/sda2(205)
+
+[root@localhost ~]# vgextend centos /dev/sdb3
+  Volume group "centos" successfully extended
+
+2.4. Extend your root logical volume (LV) by 1GB, leaving other 1GB unassigned
+
+[root@localhost ~]# df -h 	#Disc /dev/mapper/centos-root usage before adding new space
+Filesystem               Size  Used Avail Use% Mounted on
+/dev/mapper/centos-root  6.2G  2.3G  3.9G  38% /
+devtmpfs                 908M     0  908M   0% /dev
+tmpfs                    920M     0  920M   0% /dev/shm
+tmpfs                    920M  8.6M  911M   1% /run
+tmpfs                    920M     0  920M   0% /sys/fs/cgroup
+/dev/sdb1                2.0G   33M  2.0G   2% /backup
+/dev/sda1               1014M  142M  873M  14% /boot
+tmpfs                    184M     0  184M   0% /run/user/0
+
+[root@localhost ~]# lvextend -L+1G /dev/centos/root
+  Size of logical volume centos/root changed from <6.20 GiB (1586 extents) to <7.20 GiB (1842 extents).
+  Logical volume centos/root successfully resized.
+
+
+2.5. Check current disk space usage of your root device
+
+[root@localhost ~]# lvdisplay	#Checking what is our LV PAth to extend the volume and a space usage after changes
+  --- Logical volume ---
+  LV Path                /dev/centos/swap
+  LV Name                swap
+  VG Name                centos
+  LV UUID                jVJZXl-LcNX-KcKI-oohr-CO4M-1obv-ZxbfnF
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-11-14 15:53:46 -0500
+  LV Status              available
+  # open                 2
+  LV Size                820.00 MiB
+  Current LE             205
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:1
+
+  --- Logical volume ---
+  LV Path                /dev/centos/root
+  LV Name                root
+  VG Name                centos
+  LV UUID                fWhHBD-LdFz-ZNxL-tEfj-4klq-dzbi-kmsIMM
+  LV Write Access        read/write
+  LV Creation host, time localhost.localdomain, 2018-11-14 15:53:46 -0500
+  LV Status              available
+  # open                 1
+  LV Size                <7.20 GiB	#here it is
+  Current LE             1842
+  Segments               2
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           253:0
+
+2.6. Extend your root device filesystem to be able to use additional free space of root LV
+
+[root@localhost ~]# xfs_growfs /dev/centos/root		#Performing an online resizing of the logical volume
+meta-data=/dev/mapper/centos-root isize=512    agcount=4, agsize=406016 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=0 spinodes=0
+data     =                       bsize=4096   blocks=1624064, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal               bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+data blocks changed from 1624064 to 1886208
+
+[root@localhost ~]# df -h 	#Checking the available space
+Filesystem               Size  Used Avail Use% Mounted on
+/dev/mapper/centos-root  7.2G  2.3G  4.9G  32% /	#Changes here. 7.2G after 6.2G
+devtmpfs                 908M     0  908M   0% /dev
+tmpfs                    920M     0  920M   0% /dev/shm
+tmpfs                    920M  8.6M  911M   1% /run
+tmpfs                    920M     0  920M   0% /sys/fs/cgroup
+/dev/sdb1                2.0G   33M  2.0G   2% /backup
+/dev/sda1               1014M  142M  873M  14% /boot
+tmpfs                    184M     0  184M   0% /run/user/0
+
+2.7. Verify that after reboot your root device is still 1GB bigger than at 2.5.
+
+#REBOOTING
+
+[root@localhost ~]# df -h
+Filesystem               Size  Used Avail Use% Mounted on
+/dev/mapper/centos-root  7.2G  2.3G  4.9G  32% /		#profit
+devtmpfs                 908M     0  908M   0% /dev
+tmpfs                    920M     0  920M   0% /dev/shm
+tmpfs                    920M  8.6M  911M   1% /run
+tmpfs                    920M     0  920M   0% /sys/fs/cgroup
+/dev/sdb1                2.0G   33M  2.0G   2% /backup
+/dev/sda1               1014M  142M  873M  14% /boot
+tmpfs                    184M     0  184M   0% /run/user/0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
