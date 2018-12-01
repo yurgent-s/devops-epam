@@ -176,6 +176,9 @@ no label, UUID=c93bb97f-b8f1-45ff-91b0-e440f3d6ca5b
 #Uptading /etc/fstab to use swap after a system reboot
 /dev/sdb2       swap       swap       defaults       0 0
 
+#Checking the correct syntax of /etc/fstab
+[root@localhost ~]# mount -fav
+
 1.7  Reboot your host and verify that /dev/sdc1 is mounted at /backup and that your swap partition  (/dev/sdc2) is enabled
 
 #REBOOTING
