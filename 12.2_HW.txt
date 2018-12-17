@@ -1,0 +1,171 @@
+2) Task: Docker Container with Volume
+
+##Creating volume for the nginx
+docker volume create --name nginxepam
+
+##Creating the Nginx container linked to host volume 
+docker run --name=nginx -d -v nginxepam:/usr/share/nginx/html:ro -p 85:80 nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+a5a6f2f73cd8: Already exists 
+1ba02017c4b2: Pull complete 
+33b176c904de: Pull complete 
+Digest: sha256:5d32f60db294b5deb55d078cd4feb410ad88e6fe77500c87d3970eca97f54dba
+Status: Downloaded newer image for nginx:latest
+992b02248acaf1574c3ae6e71726629e966a1ee411405891651b439e82f659ae
+
+##Trying to enter into container
+[root@localhost ~]# docker exec -it nginx /bin/bash
+root@992b02248aca:/# exit
+exit
+
+##Changing html index file.
+[root@localhost ~]# docker inspect volume nginxepam ##here we checking mountpoint of the volume, where our index file should be.
+[
+    {
+        "CreatedAt": "2018-12-15T23:26:22+03:00",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/nginxepam/_data",
+        "Name": "nginxepam",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+Error: No such object: volume
+[root@localhost ~]# cd /var/lib/docker/volumes/nginxepam/_data
+[root@localhost _data]# ls
+50x.html  index.html
+[root@localhost _data]# nano index.html ##changing our index file.
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to EPAM Systems!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to EPAM Systems!</h1>
+<p>If you see this page, you are successfully
+working as a DevOps. Further configuration is required.</p>
+
+<p>For online support please refer to
+<a href="http://epam.com/">epam.com</a>.<br/>
+Commercial support is available at
+<a href="http://google.com/">google.com.com</a>.</p>
+
+<p><em>Thank you for using ur mind.</em></p>
+</body>
+</html>
+##my changes
+
+##Checking curl request
+##From Localhost
+[root@localhost _data]# curl localhost:85/
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to EPAM Systems!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to EPAM Systems!</h1>
+<p>If you see this page, you are successfully
+working as a DevOps. Further configuration is required.</p>
+
+<p>For online support please refer to
+<a href="http://epam.com/">epam.com</a>.<br/>
+Commercial support is available at
+<a href="http://google.com/">google.com.com</a>.</p>
+
+<p><em>Thank you for using ur mind.</em></p>
+</body>
+</html>
+
+##Showing logs
+[root@localhost _data]# docker logs nginx
+172.17.0.1 - - [15/Dec/2018:22:18:11 +0000] "GET / HTTP/1.1" 200 596 "-" "curl/7.29.0" "-"
+
+##Deleting container and its image
+[root@localhost ~]# docker stop nginx
+nginx
+[root@localhost ~]# docker rm nginx
+nginx
+[root@localhost ~]# docker rmi nginx
+Untagged: nginx:latest
+Untagged: nginx@sha256:5d32f60db294b5deb55d078cd4feb410ad88e6fe77500c87d3970eca97f54dba
+Deleted: sha256:568c4670fa800978e08e4a51132b995a54f8d5ae83ca133ef5546d092b864acf
+Deleted: sha256:ac0442c0fafd48e24a96fa3099ea7ad20012c8759e1dd03dd387dbfbe382984c
+Deleted: sha256:6b9d35d8d75115937cd78da275f527cccef672cbd71f34062dffe2e930fd7e13
+
+#####
+
+##Creating volume for MySql container
+[root@localhost ~]# docker volume create --name sqlvol
+sqlvol
+
+##Creating MySql docker container
+docker run --name sqlepam -v sqlvol:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=epamsys -d mysql:8
+
+##Showing that everything is stored into the localhost folder
+docker exec -it sqlepam bash
+[root@localhost ~]# cd /var/lib/docker/volumes/sqlvol/_data
+[root@localhost _data]# ll
+total 179192
+-rw-r-----. 1 polkitd input       56 дек 16 01:49 auto.cnf
+-rw-r-----. 1 polkitd input  3073835 дек 16 01:50 binlog.000001
+-rw-r-----. 1 polkitd input      155 дек 16 01:50 binlog.000002
+-rw-r-----. 1 polkitd input       32 дек 16 01:50 binlog.index
+-rw-------. 1 polkitd input     1680 дек 16 01:49 ca-key.pem
+-rw-r--r--. 1 polkitd input     1112 дек 16 01:49 ca.pem
+-rw-r--r--. 1 polkitd input     1112 дек 16 01:49 client-cert.pem
+-rw-------. 1 polkitd input     1680 дек 16 01:49 client-key.pem
+-rw-r-----. 1 polkitd input     5980 дек 16 01:50 ib_buffer_pool
+-rw-r-----. 1 polkitd input 12582912 дек 16 01:50 ibdata1
+-rw-r-----. 1 polkitd input 50331648 дек 16 01:50 ib_logfile0
+-rw-r-----. 1 polkitd input 50331648 дек 16 01:49 ib_logfile1
+-rw-r-----. 1 polkitd input 12582912 дек 16 01:50 ibtmp1
+drwxr-x---. 2 polkitd input      187 дек 16 01:50 #innodb_temp
+drwxr-x---. 2 polkitd input      143 дек 16 01:49 mysql
+-rw-r-----. 1 polkitd input 31457280 дек 16 01:50 mysql.ibd
+drwxr-x---. 2 polkitd input     4096 дек 16 01:49 performance_schema
+-rw-------. 1 polkitd input     1680 дек 16 01:49 private_key.pem
+-rw-r--r--. 1 polkitd input      452 дек 16 01:49 public_key.pem
+-rw-r--r--. 1 polkitd input     1112 дек 16 01:49 server-cert.pem
+-rw-------. 1 polkitd input     1680 дек 16 01:49 server-key.pem
+drwxr-x---. 2 polkitd input       28 дек 16 01:49 sys
+-rw-r-----. 1 polkitd input 12582912 дек 16 01:50 undo_001
+-rw-r-----. 1 polkitd input 10485760 дек 16 01:50 undo_002
+
+##Deleting container and image of mysql
+[root@localhost ~]# docker stop sqlepam
+sqlepam
+[root@localhost ~]# docker rm sqlepam
+sqlepam
+[root@localhost ~]# docker rmi mysql:8
+Untagged: mysql:8
+Untagged: mysql@sha256:b7f7479f0a2e7a3f4ce008329572f3497075dc000d8b89bac3134b0fb0288de8
+Deleted: sha256:f991c20cb5087fdd01fa7a2181f0a123a54d697681cf3723370bf50566d2e7cf
+Deleted: sha256:eb76df289a2b66f61e4065753765a81a49b7aed1c8630d832faa37c3a1b4f13d
+Deleted: sha256:287e97d6a09e53a40da558f39a95c7b87f1f5ddc6ee4882e80487bef7944d20f
+Deleted: sha256:c81b4bf6d81d0ed3348a013a9a520b30bf25e3bd47df6d142b6fad7181990950
+Deleted: sha256:b3dbc7e5378369011177f8869c3fb406c6ff0cdd3a105fa8d6ba7a0bb273f413
+Deleted: sha256:526598d6e23ff77c95097d9bd073fe0a2244a53bb78038ff5a7a6f8ccda4535a
+Deleted: sha256:7967f8fc83e2010bad53fd2fb21ab41a08ccfc9831c837fc24535467136187a2
+Deleted: sha256:593b105a77d4ff549d46eb65601b952fc5951ceff0bf03ea797ad877a4e7e16e
+Deleted: sha256:a89b4c6ee379b1a79f8948dc8009c9ed6e2729ed1fa3bad58bf01080bb538f3d
+Deleted: sha256:a783dca9de7de1093eebeab09f60e05f9c6372290d340816b17debd701a4f159
+Deleted: sha256:3579b240241d86e588a22d415ace8a2ed036817a73ab55942f662b32f9e6fb44
+Deleted: sha256:e6cf98c0c3aa81bcab324f8dac0317e2448d92e83c20a2c7bf763fc71f0831c5
+Deleted: sha256:ef68f6734aa485edf13a8509fe60e4272428deaf63f446a441b79d47fc5d17d3
