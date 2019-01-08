@@ -1,0 +1,43 @@
+1) Task: Docker Container
+
+##Creating alpine container
+[root@localhost yuri]# docker create -it alpine:3.7
+Unable to find image 'alpine:3.7' locally
+3.7: Pulling from library/alpine
+c67f3896b22c: Pull complete 
+Digest: sha256:a52b4edb6240d1534d54ee488d7cf15b3778a5cfd0e4161d426c550487cddc5d
+Status: Downloaded newer image for alpine:3.7
+3c0b4324adc917e627a307ab60c30a4eade271bf028f8c0680d78c6b3f4c8f23
+
+[root@localhost yuri]# docker ps -a	#checking what have been created
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS                      PORTS               NAMES
+3c0b4324adc9        alpine:3.7          "/bin/sh"           About a minute ago   Created                                         fervent_booth
+
+##Starting our new created container 
+[root@localhost yuri]# docker start fervent_booth
+fervent_booth
+
+##Showing logs of the container, but it is empty right now
+[root@localhost yuri]# docker logs fervent_booth
+
+##Entering the container
+[root@localhost yuri]# docker exec -it fervent_booth /bin/sh
+/ # cat /etc/os-release
+NAME="Alpine Linux"
+ID=alpine
+VERSION_ID=3.7.1
+PRETTY_NAME="Alpine Linux v3.7"
+HOME_URL="http://alpinelinux.org"
+BUG_REPORT_URL="http://bugs.alpinelinux.org"
+/ # exit
+
+##Deleting the container and it's image.
+[root@localhost yuri]# docker stop fervent_booth
+fervent_booth
+[root@localhost yuri]# docker rm fervent_booth
+fervent_booth
+[root@localhost yuri]# docker rmi alpine:3.7
+Untagged: alpine:3.7
+Untagged: alpine@sha256:a52b4edb6240d1534d54ee488d7cf15b3778a5cfd0e4161d426c550487cddc5d
+Deleted: sha256:34ea7509dcad10aa92310f2b41e3afbabed0811ee3a902d6d49cb90f075fe444
+Deleted: sha256:ebf12965380b39889c99a9c02e82ba465f887b45975b6e389d42e9e6a3857888
